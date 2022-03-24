@@ -10,7 +10,7 @@ include macros.asm
 			db 13,10,"Arquitectura de Compiladores y ensambladores 1"
 			db 13,10,"Seccion A"
 			db 13,10,"Marvin Eduardo Catalan Veliz"
-			db 13,10,"201905554","$"
+			db 13,10,"201905554",13,10,"Presione enter para continuar",10,13,"$"
 
 	menu    db 13,10,"*****MENU PRINCIPAL*****"
             db 13,10,"Opciones:"
@@ -30,6 +30,8 @@ include macros.asm
 	row5	db  000b, 000b, 000b, 000b, 000b
 
 	;VARIABLES PARA INICIAR EL JUEGO
+	turno db 0b
+	fig   db 0b
 	newgame db 13,10,"***NUEVO JUEGO***"
 	ye db 'E	|','$'
 	y4 db '4	|','$'	
@@ -43,7 +45,10 @@ include macros.asm
 	saltoLinea db 0ah, 0dh,'$'
 	xtitles db 0ah, 0dh, 32,32,32,32,32,' 	 1 B 3 D 5', 10,13,'$'
 	stop db '------------------------', '$'
-
+	turnoPlayer1 db 0ah, 0dh, ' > Turno Jugador 1: Figura [ ', '$'
+	turnoPlayer2 db 0ah, 0dh, ' > Turno Jugador 2: Figura [ ', '$'
+	figx db 'X ]$'
+	figo db 'O ]$'
 	;TEMPORALE
 	msjPrueba db 10,13,"Numero Aleatorio 1: $"
     msjPrueba2 db 10,13,"Numero Aleatorio 2 : $"
@@ -60,11 +65,29 @@ include macros.asm
     turno22  db 13, 10,"Turno 2: Jugador 1",10,13, "$"
 	FINX	 db 13, 10,"FIN DE SORTEO",10,13, "$"
 	welc 	 db 13, 10,"-----TABLERO QUIXO-----",10,13, "$"
+
+	;VARIABLES DE COMANDOS 
+	SaveWord db 'S','A','V','E','$'
+	guardando db 0ah, 0dh, '-------- GUARDANDO PARTIDA --------', 10,13,'$'
+	GetNameFichero db 0ah, 0dh, '>Ingrese nombre para guardar: ', '$'
+	;VARIABLES DE ARCHIVOS
+	bufferLectura db 200 dup('$')
+	rutaArchivo db 200 dup(0),0
+	CreateErrror db 0ah,0dh,'Error al crear archivo','$'
+	OpenError db 0ah,0dh,'Error al abrir archivo','$'
+	WriteError db 0ah,0dh,'Error al escribir en archivo','$'
+	 
+	handleFichero dw ?
+	 savemsg db 'Archivo guardado correctamente',0ah,0dh,'$'
+	cargax db '1'
+	cargao db '2'
+	carganull db '3'
 .code
 main proc
 	mov ax,@data
 	mov ds,ax
 	PrintText datos
+	PressEnter
 	start:
 		PrintText menu
 		RecibirEntrada
@@ -74,6 +97,10 @@ main proc
 			jne case2
 			;PrintText prueba
 			IniciarJuego
+			cmp turno, 0b
+			je PrintP1
+			cmp turno, 1b 
+			je PrintP2
 			jmp start
 		case2:
 			cmp bl,"2"
@@ -90,5 +117,68 @@ main proc
 		case4:
 			Cls
 			jmp start
+		PrintP1:
+			PrintText turnoPlayer1
+			cmp fig,0b 
+			je P1x 
+			cmp fig,1b 
+			je P1o 
+		P1x:
+			PrintText figx
+			cmp turno, 0b
+			je Player1
+			cmp turno, 1b 
+			je Player2
+		P1o:
+			PrintText figo
+			cmp turno, 0b
+			je Player1
+			cmp turno, 1b 
+			je Player2
+		PrintP2:
+			PrintText turnoPlayer2 
+			cmp fig,1b 
+			je P1x  
+			cmp fig, 0b   
+			je P1o 
+		Player1:
+			GetText bufferLectura
+            cmp bufferLectura[0],83
+            jne start
+            cmp bufferLectura[1],65
+            jne start
+            cmp bufferLectura[2],86
+            jne start
+            cmp bufferLectura[3],69
+            je SAVE
+			jmp start
+		Player2:
+			GetText bufferLectura
+			cmp bufferLectura[0],83
+            jne start
+            cmp bufferLectura[1],65
+            jne start
+            cmp bufferLectura[2],86
+            jne start
+            cmp bufferLectura[3],69
+            je SAVE
+			jmp start
+		SAVE:
+			PrintText guardando
+			PrintText GetNameFichero
+			getRuta rutaArchivo
+			generarCarga rutaArchivo, handleFichero
+			PrintText savemsg
+
+		ErrorCrear:
+			PrintText CreateErrror
+			jmp start ;temporal
+		ErrorAbrir:
+			PrintText OpenError
+			jmp start ;temporal
+		ErrorEscribir:
+			PrintText WriteError
+			jmp start
+
 main endp   
 end main
