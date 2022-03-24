@@ -82,6 +82,12 @@ include macros.asm
 	cargax db '1'
 	cargao db '2'
 	carganull db '3'
+	leerCarga db 200 dup(0),0
+	handleCarga dw ?
+	bufferLecturaCarga db 10 dup('$')
+	 msmError2 db 0ah,0dh,'Error al leer archivo','$'
+	 msmError3 db 0ah,0dh,'Error al crear archivo','$'
+	 msmError4 db 0ah,0dh,'Error al Escribir archivo','$'
 .code
 main proc
 	mov ax,@data
@@ -105,8 +111,13 @@ main proc
 		case2:
 			cmp bl,"2"
 			jne case3
-			PrintText prueba1
-			jmp start
+			PrintText GetNameFichero
+			GetText leerCarga
+			cargaTablero leerCarga, handleCarga, bufferLecturaCarga
+			ErrorLeer:
+				PrintText msmError2
+				getChar
+				jmp start
 		case3:
 			cmp bl,"3"
 			jne case4
