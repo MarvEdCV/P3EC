@@ -23,7 +23,7 @@ include macros.asm
 	
 	;MATRIZ 5 X 5
 	;000 -> vacio	001 -> X	100 -> O  
-	row1	db  001b, 000b, 000b, 000b, 000b
+	row1	db  000b, 000b, 000b, 000b, 000b
 	row2	db  000b, 000b, 000b, 000b, 000b
 	row3	db  000b, 000b, 000b, 000b, 000b
 	row4	db  000b, 000b, 000b, 000b, 000b
@@ -31,7 +31,6 @@ include macros.asm
 
 	;VARIABLES PARA INICIAR EL JUEGO
 	newgame db 13,10,"***NUEVO JUEGO***"
-	turno 	db 0b
 	ye db 'E	|','$'
 	y4 db '4	|','$'	
 	yc db 'C	|','$'
@@ -40,10 +39,27 @@ include macros.asm
 	x  db 'X|','$'
 	o  db 'O|','$'
 	null db	' |','$'
-	ln db '  	-------------------------', 10,13, '$'
+	ln db '  	-----------', 10,13, '$'
 	saltoLinea db 0ah, 0dh,'$'
-	xtitles db 0ah, 0dh, 32,32,32,32,32,'  1  B  3  D  5', 10,13,'$'
-	stop db '--------------------------------', '$'
+	xtitles db 0ah, 0dh, 32,32,32,32,32,' 	 1 B 3 D 5', 10,13,'$'
+	stop db '------------------------', '$'
+
+	;TEMPORALE
+	msjPrueba db 10,13,"Numero Aleatorio 1: $"
+    msjPrueba2 db 10,13,"Numero Aleatorio 2 : $"
+    numA1    db 0 ,10,13
+    numA2    db 0 ,10,13
+    pieza1x  db 13, 10,"Jugador 1 Su pieza es: X",10,13, "$"
+    pieza1O  db 13, 10,"Jugador 2 Su pieza es: O",10,13, "$"
+    pieza2x  db 13, 10,"Jugador 2 Su pieza es: X",10,13, "$"
+    pieza2O  db 13, 10,"Jugador 1 Su pieza es: O",10,13, "$"
+
+    turno11  db 13, 10,"Turno 1: Jugador 1",10,13, "$"
+    turno12  db 13, 10,"Turno 2: Jugador 2",10,13, "$"
+    turno21  db 13, 10,"Turno 1: Jugador 2",10,13, "$"
+    turno22  db 13, 10,"Turno 2: Jugador 1",10,13, "$"
+	FINX	 db 13, 10,"FIN DE SORTEO",10,13, "$"
+	welc 	 db 13, 10,"-----TABLERO QUIXO-----",10,13, "$"
 .code
 main proc
 	mov ax,@data
@@ -56,7 +72,8 @@ main proc
 		case1:
 			cmp bl,"1"
 			jne case2
-			je NUEVO
+			;PrintText prueba
+			IniciarJuego
 			jmp start
 		case2:
 			cmp bl,"2"
@@ -73,19 +90,5 @@ main proc
 		case4:
 			Cls
 			jmp start
-	NUEVO:
-		PrintText newgame
-		mov turno, 0b
-		jmp INGRESAR
-	INGRESAR:
-		PrintRow  SIZEOF row1,x,o,ye,null,row1,ln,saltoLinea
-		;PrintRow SIZEOF row2,x,o,y4,null,row2,ln,saltoLinea
-		;PrintRow SIZEOF row3x,o,yc,null,row3,ln,saltoLinea
-		;PrintRow SIZEOF row4,x,o,y2,null,row4,ln,saltoLinea
-		;PrintRow SIZEOF row5,x,o,ya,null,row5,ln,saltoLinea
-		PrintText ln
-		PrintText xtitles
-		PrintText stop
-		jmp start
 main endp   
 end main
