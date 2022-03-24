@@ -233,7 +233,7 @@ endm
 
 ;Metodo  para generar la carga de cada una de las filas de la matriz.
 generarCargaFila macro arreglo, handle
-LOCAL CICLO, printX,printO,Afuera
+LOCAL CICLO, printX,printO,Afuera,printnull
     mov cx,5
     xor si,si
     CICLO: 
@@ -241,7 +241,9 @@ LOCAL CICLO, printX,printO,Afuera
         je printX
         cmp arreglo[si],100b
         je printO
-        escribirArchivo  carganull, carganull, handle
+        cmp arreglo[si],000b   
+        je printnull
+        ;escribirArchivo  carganull, carganull, handle
         jmp Afuera
         printX:
             escribirArchivo  cargax, cargax, handle
@@ -249,6 +251,9 @@ LOCAL CICLO, printX,printO,Afuera
         printO:
             escribirArchivo  cargao, cargao, handle   
             jmp Afuera   
+        printnull:
+            escribirArchivo  carganull, carganull, handle  
+            jmp Afuera
         Afuera:
         
         inc si
@@ -269,4 +274,62 @@ escribir macro numbytes,buffer,handle
 	lea dx,buffer
 	int 21h
 	jc ErrorEscribir
+endm
+
+
+;Macro para cargar tablero, leyendo el archivo ingresados
+cargaTablero macro rutaArchivo, handle, buffer
+    abrirArchivo rutaArchivo, handle
+    leerArchivo 5, buffer, handle
+    cargarFila row1, buffer
+    leerArchivo 5, buffer, handle
+    cargarFila row2, buffer
+    leerArchivo 5, buffer, handle
+    cargarFila row3, buffer
+    leerArchivo 5, buffer, handle
+    cargarFila row4, buffer
+    leerArchivo 5, buffer, handle
+    cargarFila row5, buffer
+    cerrarArchivo handle
+ endm
+ ;Macro para leer un archvio
+ leerArchivo macro numbytes, buffer, handle
+    PUSH cx
+    leer numbytes, buffer, handle
+    POP cx
+endm
+leer macro numbytes,buffer,handle
+    mov ah,3fh
+    mov bx,handle
+    mov cx,numbytes
+    lea dx,buffer
+    int 21h
+    jc ErrorLeer
+endm
+;Macro para llenar la matriz
+cargarFila macro arreglo,  buffer
+  LOCAL CICLO, printX,printO,Afuera,printnull
+    mov cx,5
+    xor si,si
+    CICLO: 
+        cmp buffer[si],49
+        je printX
+        cmp buffer[si],50
+        je printO
+        cmp buffer[si],51
+        je printnull
+        jmp Afuera
+        printX:
+            mov arreglo[si],001b
+            jmp Afuera
+        printO:
+            mov arreglo[si],100b
+            jmp Afuera
+        printnull:
+            mov arreglo[si],000b
+        Afuera:
+
+        inc si
+        dec cx
+    JNE CICLO
 endm
