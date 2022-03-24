@@ -207,7 +207,7 @@ generarCarga macro rutaArchivo, handle
     cerrarArchivo handle
 endm
 
-
+;Macros que sirven para crear, abrir y cerrar un archivo
 crearArchivo macro buffer,handle
     mov ah,3ch
     mov cx,00h
@@ -225,7 +225,13 @@ abrirArchivo macro ruta,handle
     mov handle,ax
     jc ErrorAbrir
 endm
+cerrarArchivo macro handle
+    mov ah,3eh
+    mov handle,bx
+    int 21h
+endm
 
+;Metodo  para generar la carga de cada una de las filas de la matriz.
 generarCargaFila macro arreglo, handle
 LOCAL CICLO, printX,printO,Afuera
     mov cx,5
@@ -249,11 +255,8 @@ LOCAL CICLO, printX,printO,Afuera
         dec cx
     JNE CICLO
 endm
-cerrarArchivo macro handle
-    mov ah,3eh
-    mov handle,bx
-    int 21h
-endm
+
+;Macros utilizadas para escribir sobre el archivo lo que tengan las columnas del tablero 
 escribirArchivo macro numbytes,buffer,handle
     push cx
     escribir  numbytes,buffer,handle
