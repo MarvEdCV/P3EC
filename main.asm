@@ -23,11 +23,11 @@ include macros.asm
 	
 	;MATRIZ 5 X 5
 	;000 -> vacio	001 -> X	100 -> O  
-	row1	db  000b, 000b, 000b, 100b, 000b
+	row1	db  000b, 000b, 000b, 000b, 000b
 	row2	db  000b, 000b, 000b, 000b, 000b
-	row3	db  000b, 000b, 100b, 000b, 000b
+	row3	db  000b, 000b, 000b, 000b, 000b
 	row4	db  000b, 000b, 000b, 000b, 000b
-	row5	db  000b, 000b, 000b, 000b, 100b
+	row5	db  000b, 000b, 000b, 000b, 000b
 
 	;VARIABLES PARA INICIAR EL JUEGO
 	turno db 0b
@@ -92,6 +92,7 @@ include macros.asm
 	 msmError3 db 0ah,0dh,'Error al crear archivo','$'
 	 msmError4 db 0ah,0dh,'Error al Escribir archivo','$'
 	msgexit db 0ah,0dh,'****Juego finalizado****',10,13,'$'
+	cargadook db 0ah,0dh,'****Juego cargado con exito****',10,13,'$'
 
 	;Variables para REPORTE HTML
 	htmlopen db '<html><head><link rel="stylesheet" href="style.css"></head><body>',0ah,0dh
@@ -147,6 +148,7 @@ main proc
 			PrintText GetNameFichero
 			GetText leerCarga
 			cargaTablero leerCarga, handleCarga, bufferLecturaCarga
+			jmp start
 			ErrorLeer:
 				PrintText msmError2
 				getChar
@@ -240,10 +242,10 @@ main proc
 			jmp start
 		ErrorCrear:
 			PrintText CreateErrror
-			jmp TURN ;temporal
+			jmp TURN 
 		ErrorAbrir:
 			PrintText OpenError
-			jmp TURN ;temporal
+			jmp TURN
 		ErrorEscribir:
 			PrintText WriteError
 			jmp TURN
