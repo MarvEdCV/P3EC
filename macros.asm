@@ -292,6 +292,7 @@ cargaTablero macro rutaArchivo, handle, buffer
     leerArchivo 5, buffer, handle
     cargarFila row5, buffer
     cerrarArchivo handle
+    PrintText cargadook
  endm
  ;Macro para leer un archvio
  leerArchivo macro numbytes, buffer, handle
@@ -305,7 +306,7 @@ leer macro numbytes,buffer,handle
     mov cx,numbytes
     lea dx,buffer
     int 21h
-    ;jc ErrorLeer
+    jc ErrorLeer
 endm
 ;Macro para llenar la matriz
 cargarFila macro arreglo,  buffer
