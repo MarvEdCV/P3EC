@@ -243,7 +243,6 @@ LOCAL CICLO, printX,printO,Afuera,printnull
         je printO
         cmp arreglo[si],000b   
         je printnull
-        ;escribirArchivo  carganull, carganull, handle
         jmp Afuera
         printX:
             escribirArchivo  cargax, cargax, handle
@@ -304,10 +303,11 @@ leer macro numbytes,buffer,handle
     mov cx,numbytes
     lea dx,buffer
     int 21h
-    jc ErrorLeer
+    ;jc ErrorLeer
 endm
 ;Macro para llenar la matriz
 cargarFila macro arreglo,  buffer
+
   LOCAL CICLO, printX,printO,Afuera,printnull
     mov cx,5
     xor si,si
@@ -332,4 +332,136 @@ cargarFila macro arreglo,  buffer
         inc si
         dec cx
     JNE CICLO
+endm
+
+;MACROS PARA HTML
+
+ObtFecha macro buffer
+    xor ax, ax
+    xor bx, bx
+    mov ah, 2ah
+    int 21h
+    mov di,0
+    mov al,dl
+    convertirBCD buffer
+    inc di
+    mov al, dh
+    convertirBCD buffer
+    inc di
+    mov buffer[di], 32h
+    inc di
+    mov buffer[di], 30h 
+    inc di 
+    mov buffer[di], 32h
+    inc di
+    mov buffer[di], 30h
+endm
+
+ObtHora macro buffer
+    xor     ax, ax
+    xor     bx, bx
+    mov     ah, 2ch
+    int     21h
+    mov     di,0
+    mov     al, ch
+    convertirBCD buffer
+    inc     di
+    mov     al, cl
+    convertirBCD buffer
+    inc     di
+    mov     al, dh
+    convertirBCD buffer
+endm
+
+
+convertirBCD macro buffer
+
+    push dx
+    xor dx,dx
+    mov dl,al
+    xor ax,ax
+    mov bl,0ah
+    mov al,dl
+    div bl
+    push ax
+    add al,30h
+    mov buffer[di], al
+    inc di
+    pop ax
+    add ah,30h
+    mov buffer[di], ah
+    inc di
+    pop dx
+endm
+;MACRO PARA PINTAR SIMBOLOS EN EL CODIGO DEL HTML
+GenerateSimbol macro arreglo, handle
+    LOCAL CICLO, printPIEZAO, printPIEZAX,printVACIO, Afuera
+    mov cx,5
+    xor si,si
+    CICLO: 
+        escribirArchivo  htmltd, htmltd, handle
+        cmp arreglo[si],100
+        je printPIEZAO
+
+        cmp arreglo[si],001
+        je printPIEZAX
+
+        cmp arreglo[si],000
+        je printVACIO
+
+        printPIEZAO:
+            escribirArchivo  htmlPiezao, htmlPiezao, handle
+            jmp Afuera
+        printPIEZAX:
+            escribirArchivo  htmlPiezaX, htmlPiezaX, handle
+            jmp Afuera
+        printVACIO:
+            escribirArchivo htmlvacio, htmlvacio, handle
+        Afuera:
+            escribirArchivo  htmltdcl, htmltdcl, handle
+
+        inc si
+        dec cx
+    JNE CICLO
+endm
+
+ReporteHTML macro htmlopen,htmlclose,htmltable,htmltablecl,htmltr,htmltrcl,htmltd,htmltdcl, rutaArchivohtml, handle
+    crearArchivo rutaArchivohtml, handle
+    abrirArchivo rutaArchivohtml, handle
+    escribirArchivo  htmlopen, htmlopen, handle
+    escribirArchivo  htmlh1,htmlh1,handle
+    escribirArchivo  encabezado, encabezado, handle
+    escribirArchivo  htmlh1cl,htmlh1cl,handle
+    escribirArchivo  htmlh1,htmlh1,handle
+    ObtFecha bufferFecha
+    ObtHora bufferHora
+    escribirArchivo bufferFecha, bufferFecha, handle
+    escribirArchivo  bufferHora, bufferHora, handle
+    escribirArchivo  htmlh1cl,htmlh1cl,handle
+    escribirArchivo  htmltable, htmltable, handle
+    escribirArchivo htmltr, htmltr, handle
+    escribirArchivo htmlIE, htmlIE, handle 
+    GenerateSimbol row1, handle
+    escribirArchivo htmltrcl, htmltrcl, handle
+    escribirArchivo htmltr, htmltr, handle
+    escribirArchivo htmlID, htmlID, handle 
+    GenerateSimbol row2, handle
+    escribirArchivo htmltrcl, htmltrcl, handle
+    escribirArchivo htmltr, htmltr, handle
+    escribirArchivo htmlIC, htmlIC, handle 
+    GenerateSimbol row3, handle
+    escribirArchivo htmltrcl, htmltrcl, handle
+    escribirArchivo  htmltr, htmltr, handle
+    escribirArchivo htmlIB, htmlIB, handle 
+    GenerateSimbol row4, handle
+    escribirArchivo  htmltrcl, htmltrcl, handle
+    escribirArchivo  htmltr, htmltr, handle
+    escribirArchivo htmlIA, htmlIA, handle 
+    GenerateSimbol row5, handle
+    escribirArchivo  htmltrcl, htmltrcl, handle
+    escribirArchivo htmlInInfere, htmlInInfere, handle
+    escribirArchivo  htmltablecl, htmltablecl, handle
+    escribirArchivo htmlclose, htmlclose, handle
+    cerrarArchivo handle
+    PrintText htmlok
 endm
