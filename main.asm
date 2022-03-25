@@ -72,6 +72,7 @@ include macros.asm
 	SaveWord db 'S','A','V','E','$'
 	guardando db 0ah, 0dh, '-------- GUARDANDO PARTIDA --------', 10,13,'$'
 	GetNameFichero db 0ah, 0dh, '>Ingrese nombre para guardar: ', '$'
+	GetNameFichero2 db 0ah, 0dh, '>Ingrese nombre para cargar: ', '$'
 	;VARIABLES DE ARCHIVOS
 	bufferLectura db 200 dup('$')
 	rutaArchivo db 200 dup(0),0
@@ -145,7 +146,7 @@ main proc
 		case2:
 			cmp bl,"2"
 			jne case3
-			PrintText GetNameFichero
+			PrintText GetNameFichero2
 			GetText leerCarga
 			cargaTablero leerCarga, handleCarga, bufferLecturaCarga
 			jmp start
