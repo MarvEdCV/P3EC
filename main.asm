@@ -54,16 +54,18 @@ include macros.asm
     msjPrueba2 db 10,13,"Numero Aleatorio 2 : $"
     numA1    db 0 ,10,13
     numA2    db 0 ,10,13
-    pieza1x  db 13, 10,"Jugador 1 Su pieza es: X",10,13, "$"
+    pieza1x  db 13, 10,"Jugador 1 Su pieza es: X", "$"
     pieza1O  db 13, 10,"Jugador 2 Su pieza es: O",10,13, "$"
     pieza2x  db 13, 10,"Jugador 2 Su pieza es: X",10,13, "$"
-    pieza2O  db 13, 10,"Jugador 1 Su pieza es: O",10,13, "$"
+    pieza2O  db 13, 10,"Jugador 1 Su pieza es: O", "$"
 
-    turno11  db 13, 10,"Turno 1: Jugador 1",10,13, "$"
+    turno11  db 13, 10,"Turno 1: Jugador 1", "$"
     turno12  db 13, 10,"Turno 2: Jugador 2",10,13, "$"
-    turno21  db 13, 10,"Turno 1: Jugador 2",10,13, "$"
+    turno21  db 13, 10,"Turno 1: Jugador 2", "$"
     turno22  db 13, 10,"Turno 2: Jugador 1",10,13, "$"
-	FINX	 db 13, 10,"FIN DE SORTEO",10,13, "$"
+	FINX	 db 13, 10,"*****	FIN DE SORTEO	*****",10,13, "$"
+	GETCOMANDO	 db 13, 10,">Command: ", "$"
+	INICIOX	 db 13, 10,"***	   INICIO DE SORTEO	 ***",10,13, "$"
 	welc 	 db 13, 10,"-----TABLERO QUIXO-----",10,13, "$"
 
 	;VARIABLES DE COMANDOS 
@@ -131,8 +133,9 @@ main proc
 		case1:
 			cmp bl,"1"
 			jne case2
-			;PrintText prueba
 			IniciarJuego
+			jmp TURN
+		TURN:
 			cmp turno, 0b
 			je PrintP1
 			cmp turno, 1b 
@@ -151,7 +154,6 @@ main proc
 		case3:
 			cmp bl,"3"
 			jne case4
-			PrintText prueba2
 			mov ah,4ch
 			int 21h
 			jmp start
@@ -183,6 +185,7 @@ main proc
 			cmp fig, 0b   
 			je P1o 
 		Player1:
+			PrintText GETCOMANDO
 			GetText bufferLectura
 			SAV:
 				cmp bufferLectura[0],83
@@ -219,37 +222,31 @@ main proc
 				je salir
 				
 		Player2:
+			PrintText GETCOMANDO
 			GetText bufferLectura
-			cmp bufferLectura[0],83
-            jne start
-            cmp bufferLectura[1],65
-            jne start
-            cmp bufferLectura[2],86
-            jne start
-            cmp bufferLectura[3],69
-            je SAVE
-			jmp start
+			jmp SAV
 		SAVE:
 			PrintText guardando
 			PrintText GetNameFichero
 			getRuta rutaArchivo
 			generarCarga rutaArchivo, handleFichero
 			PrintText savemsg
+			jmp TURN
 		SHOW:
 			ReporteHTML htmlopen,htmlclose,htmltable,htmltablecl,htmltr,htmltrcl,htmltd,htmltdcl, rutaArchivohtml, handehtml
-			jmp start
+			jmp TURN
 		SALIR:
 			PrintText msgexit
 			jmp start
 		ErrorCrear:
 			PrintText CreateErrror
-			jmp start ;temporal
+			jmp TURN ;temporal
 		ErrorAbrir:
 			PrintText OpenError
-			jmp start ;temporal
+			jmp TURN ;temporal
 		ErrorEscribir:
 			PrintText WriteError
-			jmp start
+			jmp TURN
 
 main endp   
 end main
