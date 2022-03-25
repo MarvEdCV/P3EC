@@ -47,9 +47,10 @@ PrintRow macro len, x, o, y, null,row,ln, enter
 endm
 
 IniciarJuego macro
-    PrintText prueba
+  PrintText INICIOX
     PrintText msjPrueba
     numAleatorio1
+    
     mov ah, 02h
     mov dl, numA1
     add dl, '0'
@@ -65,6 +66,7 @@ IniciarJuego macro
         jmp next
     next:
       PrintText msjPrueba2
+      
       numAleatorio2
       mov ah, 02h
       mov dl, numA2
