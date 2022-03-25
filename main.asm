@@ -23,11 +23,11 @@ include macros.asm
 	
 	;MATRIZ 5 X 5
 	;000 -> vacio	001 -> X	100 -> O  
-	row1	db  000b, 000b, 000b, 000b, 000b
+	row1	db  000b, 000b, 000b, 100b, 000b
 	row2	db  000b, 000b, 000b, 000b, 000b
-	row3	db  000b, 000b, 000b, 000b, 000b
+	row3	db  000b, 000b, 100b, 000b, 000b
 	row4	db  000b, 000b, 000b, 000b, 000b
-	row5	db  000b, 000b, 000b, 000b, 000b
+	row5	db  000b, 000b, 000b, 000b, 100b
 
 	;VARIABLES PARA INICIAR EL JUEGO
 	turno db 0b
@@ -78,6 +78,7 @@ include macros.asm
 	WriteError db 0ah,0dh,'Error al escribir en archivo','$'
 	 
 	handleFichero dw ?
+	handehtml dw ?
 	 savemsg db 'Archivo guardado correctamente',0ah,0dh,'$'
 	cargax db '1'
 	cargao db '2'
@@ -88,6 +89,35 @@ include macros.asm
 	 msmError2 db 0ah,0dh,'Error al leer archivo','$'
 	 msmError3 db 0ah,0dh,'Error al crear archivo','$'
 	 msmError4 db 0ah,0dh,'Error al Escribir archivo','$'
+	msgexit db 0ah,0dh,'****Juego finalizado****',10,13,'$'
+
+	;Variables para REPORTE HTML
+	htmlopen db '<html><head><link rel="stylesheet" href="style.css"></head><body>',0ah,0dh
+    htmlclose db '</body></html>',0ah,0dh
+    htmltable db '<center><table bgcolor="PeachPuff">',0ah,0dh
+    htmltablecl db '</center></table>',0ah,0dh
+    htmltr db '<tr>',0ah,0dh
+    htmltrcl db '</tr>',0ah,0dh
+    htmltd db '<td WIDTH="50" HEIGHT="50">'
+    htmltdcl db '</td>',0ah,0dh
+    htmlvacio db '<img src = "vacio.png"  WIDTH="50" HEIGHT="50">'
+    htmlPiezao db '<img src = "equis.png" WIDTH="50" HEIGHT="50" >'
+    htmlPiezaX db '<img src = "o.png" WIDTH="50" HEIGHT="50">'
+    htmlh1 db '<center><h1 style="color:black">'
+    htmlh1cl db '</h1></center>'
+    htmlok db 'Archivo html generado correctamente',0ah,0dh,'$'
+    encabezado db 'Marvin Eduardo Catalan Veliz 201905554'
+    rutaArchivohtml db 'RMECV.htm',00h
+;INDICES Y
+    htmlIE db '<td>E</td>'
+    htmlID db '<td>4</td>'
+    htmlIC db '<td>C</td>'
+    htmlIB db '<td>2</td>'
+    htmlIA db '<td>A</td>'
+;INDICES X
+    htmlInInfere db '<tr><td></td><td>1</td><td>B</td><td>3</td><td>D</td><td>5</td></tr>'
+    bufferFecha db 12 dup('-')
+    bufferHora db 8 dup(':')
 .code
 main proc
 	mov ax,@data
@@ -154,15 +184,40 @@ main proc
 			je P1o 
 		Player1:
 			GetText bufferLectura
-            cmp bufferLectura[0],83
-            jne start
-            cmp bufferLectura[1],65
-            jne start
-            cmp bufferLectura[2],86
-            jne start
-            cmp bufferLectura[3],69
-            je SAVE
-			jmp start
+			SAV:
+				cmp bufferLectura[0],83
+				jne SHOWHTM
+				cmp bufferLectura[1],65
+				jne SHOWHTM
+				cmp bufferLectura[2],86
+				jne SHOWHTM
+				cmp bufferLectura[3],69
+				je SAVE
+			SHOWHTM:
+				cmp bufferLectura[0],83
+				jne EXIT
+				cmp bufferLectura[1],72
+				jne EXIT
+				cmp bufferLectura[2],79
+				jne EXIT
+				cmp bufferLectura[3],87
+				jne EXIT
+				cmp bufferLectura[4], 72
+				jne EXIT
+				cmp bufferLectura[5], 84
+				jne EXIT
+				cmp bufferLectura[6], 77
+				je SHOW
+			EXIT:
+				cmp bufferLectura[0],69
+				jne start
+				cmp bufferLectura[1],88
+				jne start
+				cmp bufferLectura[2],73
+				jne start
+				cmp bufferLectura[3],84 
+				je salir
+				
 		Player2:
 			GetText bufferLectura
 			cmp bufferLectura[0],83
@@ -180,7 +235,12 @@ main proc
 			getRuta rutaArchivo
 			generarCarga rutaArchivo, handleFichero
 			PrintText savemsg
-
+		SHOW:
+			ReporteHTML htmlopen,htmlclose,htmltable,htmltablecl,htmltr,htmltrcl,htmltd,htmltdcl, rutaArchivohtml, handehtml
+			jmp start
+		SALIR:
+			PrintText msgexit
+			jmp start
 		ErrorCrear:
 			PrintText CreateErrror
 			jmp start ;temporal
